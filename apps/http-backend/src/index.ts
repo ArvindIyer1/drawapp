@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { middleware } from "./middleware";
 import { UserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/db/client";
 import bcrypt from "bcryptjs";
 
 const app = express();
@@ -40,8 +40,8 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/signin", async (req, res) => {
-  const { success } = SigninSchema.safeParse(req.body);
-  if (!success) {
+  const result = SigninSchema.safeParse(req.body);
+  if (!result.success) {
     return res.status(411).json({
       msg: "Email Address is already taken or incorrect inputs",
     });
@@ -49,7 +49,8 @@ app.post("/signin", async (req, res) => {
 
   const user = await prisma.user.findFirst({
     where: {
-      email: req.body.username,
+      email: result.data.username,
+      password:result.data.password
     },
   });
 
@@ -78,16 +79,30 @@ app.post("/signin", async (req, res) => {
 });
 
 app.post("/room", middleware, async (req, res) => {
-  const { success } = CreateRoomSchema.safeParse(req.body);
-  if (!success) {
+  const result = CreateRoomSchema.safeParse(req.body);
+  if (!result.success) {
     return res.status(411).json({
       msg: "Email Address is already taken or incorrect inputs",
     });
   }
 
-  res.json({
-    roomId: 123,
-  });
+  //@ts-ignore
+  const userId = req.userId;
+  try{
+    const room = await prisma.room.create({
+      data:{
+        slug : result.data.name,
+        adminId : userId
+      }
+    })
+    res.json({
+      roomId: room.id,
+    });
+ }catch(e){
+  return res.status(411).json({
+    msg:"room alr exists"
+  })
+ }
 });
 
 app.listen(3001);

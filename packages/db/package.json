@@ -4,19 +4,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./client": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  ".": "./src/index.ts",
+  "./client": "./src/index.ts"
+},
   "scripts": {
-    "build": "pnpm exec prisma generate && pnpm exec tsc -b tsconfig.json --force",
-    "generate": "pnpm exec prisma generate",
-    "postinstall": "pnpm exec prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
