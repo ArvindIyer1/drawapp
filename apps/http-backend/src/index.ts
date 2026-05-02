@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { middleware } from "./middleware";
 import { UserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types";
-import { prisma } from "@repo/db/client";
+import { prisma, prismaClient } from "@repo/db/client";
 import bcrypt from "bcryptjs";
 
 const app = express();
@@ -104,5 +104,21 @@ app.post("/room", middleware, async (req, res) => {
   })
  }
 });
+
+app.get("/chats/:roomId" ,async (req,res) => {
+    const roomId = Number(req.params.roomId);
+    const messages = prismaClient.chat.findMany({
+      where :{
+        roomId:roomId
+      },
+      orderBy :{
+        id :"desc"
+      },
+      take:50
+    });
+    res.json({
+      messages
+    }) 
+  })
 
 app.listen(3001);
