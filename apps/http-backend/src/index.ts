@@ -5,9 +5,11 @@ import { middleware } from "./middleware";
 import { UserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types";
 import { prisma, prismaClient } from "@repo/db/client";
 import bcrypt from "bcryptjs";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 app.post("/signup", async (req, res) => {
   const parsedData = UserSchema.safeParse(req.body);
