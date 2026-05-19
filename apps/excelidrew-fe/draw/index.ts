@@ -98,9 +98,10 @@ export async function initDraw(canvas:HTMLCanvasElement,roomId: string,socket:We
           if(selectedTool === "rectangle"){
             ctx?.strokeRect(startX,startY,width,height);
           }else if(selectedTool === "circle"){
-            const centerX = startX + width/2;
-            const centerY = startY + height/2;
             const radius = Math.max(width,height) /2;
+            const centerX = startX + radius;
+            const centerY = startY + radius;
+            
             ctx.beginPath();
             ctx.arc(centerX,centerY,radius,0,Math.PI * 2);
             ctx.stroke();
