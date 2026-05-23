@@ -9,7 +9,8 @@ export function middleware(req: Request, res: Response, next: NextFunction) {
     return res.status(403).json({ msg: "no token" });
   }
   try {
-    jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    req.userId = decoded.userId;
     next();
   } catch {
     return res.status(403).json({ msg: "invalid token" });

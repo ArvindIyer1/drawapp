@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { middleware } from "./middleware";
 import { UserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types";
-import { prisma, prismaClient } from "@repo/db/client";
-import bcrypt from "bcryptjs";
+import { prismaClient } from "@repo/db/client";
+import bcrypt from "bcrypt";
 import cors from "cors";
 
 const app = express();
@@ -22,7 +22,7 @@ app.post("/signup", async (req, res) => {
   const hashedP = await bcrypt.hash(req.body.password, 10);
 
   try {
-    const userC = await prisma.user.create({
+    const userC = await prismaClient.user.create({
       data: {
         email: parsedData.data.username,
         password: hashedP,
@@ -49,10 +49,10 @@ app.post("/signin", async (req, res) => {
     });
   }
 
-  const user = await prisma.user.findFirst({
+  const user = await prismaClient.user.findFirst({
     where: {
       email: result.data.username,
-      password:result.data.password
+      
     },
   });
 
@@ -88,10 +88,15 @@ app.post("/room", middleware, async (req, res) => {
     });
   }
 
-  //@ts-ignore
+ 
   const userId = req.userId;
+  if (!userId) {
+    return res.status(403).json({
+      msg: "no token",
+    });
+  }
   try{
-    const room = await prisma.room.create({
+    const room = await prismaClient.room.create({
       data:{
         slug : result.data.name,
         adminId : userId
@@ -109,7 +114,7 @@ app.post("/room", middleware, async (req, res) => {
 
 app.get("/chats/:roomId" ,async (req,res) => {
     const roomId = Number(req.params.roomId);
-    const messages = prismaClient.chat.findMany({
+    const messages = await prismaClient.chat.findMany({
       where :{
         roomId:roomId
       },
@@ -125,7 +130,7 @@ app.get("/chats/:roomId" ,async (req,res) => {
 
   app.get("/room/:slug" ,async (req,res) => {
     const slug = req.params.slug;
-    const room = prismaClient.room.findFirst({
+    const room = await prismaClient.room.findFirst({
       where :{
         slug
       }

@@ -75,6 +75,7 @@ export class Game {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillStyle = "rgba(0,0,0)";
     this.ctx?.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
 
     this.existingShapes.map((shape) => {
       if (shape.type === "rect") {
@@ -83,9 +84,11 @@ export class Game {
       } else if (shape.type === "circle") {
 
         this.ctx.beginPath();
-        this.ctx.arc(shape.centerX, shape.centerY, shape.radius, 0, Math.PI * 2);
+        this.ctx.arc(shape.centerX, shape.centerY, Math.abs(shape.radius), 0, Math.PI * 2);
         this.ctx.stroke();
         this.ctx.closePath();
+      }else if(shape.type === "pencil"){
+        
       }
     })
   }
@@ -145,7 +148,7 @@ export class Game {
         const centerY = this.startY + radius;
 
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.arc(centerX, centerY, Math.abs(radius), 0, Math.PI * 2);
         this.ctx.stroke();
         this.ctx.closePath();
       }
